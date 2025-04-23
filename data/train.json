@@ -1,0 +1,350 @@
+[
+  {
+    "messages": [
+      { "role": "user", "content": "¿Qué son los números naturales?" },
+      { "role": "assistant", "content": "Los números naturales (ℕ) son el conjunto de números enteros positivos: 1, 2, 3, 4, 5,... Se utilizan para contar y ordenar elementos." }
+    ]
+  },
+  {
+    "messages": [
+      { "role": "user", "content": "Ejemplos de números enteros" },
+      { "role": "assistant", "content": "El conjunto de enteros (ℤ) incluye: -3, -2, -1, 0, 1, 2, 3. Son números sin parte decimal, positivos y negativos." }
+    ]
+  },
+  {
+    "messages": [
+      { "role": "user", "content": "¿Es 5/3 un número racional?" },
+      { "role": "assistant", "content": "Sí, 5/3 es racional (ℚ) porque puede expresarse como fracción de dos enteros. Su decimal es 1.666... periódico." }
+    ]
+  },
+  {
+    "messages": [
+      { "role": "user", "content": "Clasifica π en los conjuntos numéricos" },
+      { "role": "assistant", "content": "π (pi) es un número irracional (𝕀) y real (ℝ). Su decimal es infinito no periódico: 3.1415926535..." }
+    ]
+  },
+  {
+    "messages": [
+      { "role": "user", "content": "¿Cuántos números primos hay entre 1 y 10?" },
+      { "role": "assistant", "content": "Hay 4 números primos: 2, 3, 5 y 7. Los primos solo son divisibles por 1 y sí mismos." }
+    ]
+  },
+  {
+    "messages": [
+      { "role": "user", "content": "Diferencia entre enteros y naturales" },
+      { "role": "assistant", "content": "ℕ incluye solo positivos (1,2,3...), mientras que ℤ añade negativos y cero: ...-2,-1,0,1,2..." }
+    ]
+  },
+  {
+    "messages": [
+      { "role": "user", "content": "¿Es -4 un número natural?" },
+      { "role": "assistant", "content": "No. -4 pertenece a los enteros (ℤ) pero no a los naturales (ℕ), que solo contienen positivos." }
+    ]
+  },
+  {
+    "messages": [
+      { "role": "user", "content": "¿Por qué √9 es racional?" },
+      { "role": "assistant", "content": "√9 = 3, que es entero y por tanto racional. Los irracionales tienen raíces no exactas como √2." }
+    ]
+  },
+  {
+    "messages": [
+      { "role": "user", "content": "Ejemplo de número par y primo" },
+      { "role": "assistant", "content": "El único número par y primo es 2. Todos los demás pares son divisibles por 2 y por tanto no primos." }
+    ]
+  },
+  {
+    "messages": [
+      { "role": "user", "content": "¿A qué conjunto pertenece 0?" },
+      { "role": "assistant", "content": "0 es entero (ℤ), racional (ℚ) y real (ℝ). No es natural en la definición clásica, pero sí en algunas modernas." }
+    ]
+  },
+  {
+    "messages": [
+      { "role": "user", "content": "Clasifica 1.5 en los conjuntos numéricos" },
+      { "role": "assistant", "content": "1.5 es racional (ℚ) y real (ℝ). Puede expresarse como 3/2, por lo que no es entero ni natural." }
+    ]
+  },
+  {
+    "messages": [
+      { "role": "user", "content": "¿Es 1 un número primo?" },
+      { "role": "assistant", "content": "No. Por definición, los primos tienen exactamente dos divisores distintos. El 1 solo tiene un divisor." }
+    ]
+  },
+  {
+    "messages": [
+      { "role": "user", "content": "¿Cómo se relacionan ℕ, ℤ y ℚ?" },
+      { "role": "assistant", "content": "ℕ ⊂ ℤ ⊂ ℚ ⊂ ℝ. Los naturales están contenidos en enteros, estos en racionales, y todos en reales." }
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "Resuelve: 3x + 5 = 2x - 7"},
+      {"role": "assistant", "content": "3x - 2x = -7 - 5 → x = -12. Ecuación lineal: despeje mediante operaciones inversas"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "Resuelve 2x² - 8x + 6 = 0"},
+      {"role": "assistant", "content": "Fórmula cuadrática: x = [8 ± √(64-48)]/4 = [8 ± 4]/4 → x₁=3, x₂=1. Factorizable: 2(x-1)(x-3)=0"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "Resuelve |x - 4| = 9"},
+      {"role": "assistant", "content": "Caso 1: x - 4 = 9 → x=13. Caso 2: x - 4 = -9 → x=-5. Soluciones: x=13 y x=-5"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "Resuelve (2x+1)/(x-3) = 5"},
+      {"role": "assistant", "content": "Multiplicar cruzado: 2x+1 = 5(x-3) → 2x+1=5x-15 → -3x=-16 → x=16/3. Verificar: denominador ≠ 0"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "Resuelve √(3x+4) = 5"},
+      {"role": "assistant", "content": "Elevar al cuadrado: 3x+4=25 → 3x=21 → x=7. Comprobación: √(25)=5 ✓"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "Resuelve x³ - 6x² + 11x - 6 = 0"},
+      {"role": "assistant", "content": "Factorizando: (x-1)(x-2)(x-3)=0 → Raíces: x=1, x=2, x=3. Polinomio cúbico por Ruffini"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "Resuelve 5^(x-2) = 25"},
+      {"role": "assistant", "content": "Expresar 25=5²: 5^(x-2)=5² → x-2=2 → x=4. Ecuación exponencial por misma base"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "Resuelve log₂(x+3) = 4"},
+      {"role": "assistant", "content": "Forma exponencial: 2⁴ = x+3 → 16 = x+3 → x=13. Verificar dominio: x+3>0"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "Resuelve x⁴ - 5x² + 4 = 0"},
+      {"role": "assistant", "content": "Sustitución y=x²: y²-5y+4=0 → y=4 e y=1 → x=±2 y x=±1. Ecuación bicuadrada"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "Resuelve √(x+5) + √(x) = 5"},
+      {"role": "assistant", "content": "Aislar radical: √(x+5)=5-√x → elevar al cuadrado: x+5=25-10√x +x → 10√x=20 → √x=2 → x=4. Verificar solución"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "Resuelve |x² - 5| = 4"},
+      {"role": "assistant", "content": "Caso 1: x²-5=4 → x²=9 → x=±3. Caso 2: x²-5=-4 → x²=1 → x=±1. Soluciones: ±1, ±3"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "Resuelve (x+2)/(x-1) = (x-3)/(x+4)"},
+      {"role": "assistant", "content": "Multiplicar cruzado: (x+2)(x+4)=(x-1)(x-3) → x²+6x+8 = x²-4x+3 → 10x = -5 → x=-1/2. Verificar dominios"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "Resuelve 2x + 3 = 2x + 5"},
+      {"role": "assistant", "content": "2x - 2x = 5 - 3 → 0=2. No solución. Ecuación incompatible"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "Resuelve 3/(x²-1) + 2/(x-1) = 5"},
+      {"role": "assistant", "content": "Factor denominador: 3/[(x-1)(x+1)] + 2/(x-1) = 5 → MCD: (x-1)(x+1). Solución: x=2/5 (verificar exclusiones x≠±1)"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "Resuelve √(2x-1) = x - 2"},
+      {"role": "assistant", "content": "Elevar al cuadrado: 2x-1 = x²-4x+4 → x²-6x+5=0 → x=5 y x=1. Comprobar: x=5 ✓, x=1 (falso). Solución única x=5"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "Resuelve 0.5x - 1.2 = 2.3x + 4.1"},
+      {"role": "assistant", "content": "0.5x - 2.3x = 4.1 + 1.2 → -1.8x = 5.3 → x = -53/18 ≈ -2.944. Ecuación lineal con decimales"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "Resuelve x² - 6x + 2 = 0 usando completación de cuadrados"},
+      {"role": "assistant", "content": "x²-6x = -2 → (x-3)² -9 = -2 → (x-3)² = 7 → x = 3±√7. Solución exacta con radicales"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "Resuelve x³ + 2x² - 5x - 6 = 0"},
+      {"role": "assistant", "content": "Por división sintética: raíz x=2 → (x-2)(x²+4x+3)=0 → x=2, x=-1, x=-3. Polinomio cúbico factorizado"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "Resuelve |2x + 1| = |x - 3|"},
+      {"role": "assistant", "content": "Casos: 2x+1 = x-3 → x=-4; o 2x+1 = -(x-3) → 3x=2 → x=2/3. Soluciones: x=-4 y x=2/3"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "Resuelve (x+2)/(x²-4) + 1/(x-2) = 3"},
+      {"role": "assistant", "content": "Factorizar denominador: (x+2)/[(x-2)(x+2)] + 1/(x-2) = 3 → 1/(x-2) + 1/(x-2) = 3 → 2/(x-2)=3 → x=2 + 2/3 = 8/3. Excluir x=±2"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "Resuelve √(x+1) + √(2x) = 3"},
+      {"role": "assistant", "content": "Aislar √(x+1)=3-√(2x) → cuadrar: x+1=9-6√(2x)+2x → ordenar y cuadrar nuevamente. Solución final x=1 (verificar)"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "Resuelve 3^(2x) = 9^(x+1)"},
+      {"role": "assistant", "content": "Expresar 9=3²: 3^(2x) = (3²)^(x+1) → 2x = 2(x+1) → 2x=2x+2 → 0=2 → No solución"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "Resuelve log(x) + log(x+3) = 1"},
+      {"role": "assistant", "content": "Propiedad logarítmica: log[x(x+3)] = 1 → x²+3x = 10 → x²+3x-10=0 → x=2 (x=-5 descartado). Dominio x>0"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "Resuelve el sistema: 2x + y = 7; x² - y = 1"},
+      {"role": "assistant", "content": "Despejar y=7-2x en segunda ecuación: x² - (7-2x) =1 → x²+2x-8=0 → x=2 → y=3; x=-4 → y=15. Soluciones: (2,3) y (-4,15)"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "La suma de tres enteros consecutivos es 78. Encuéntralos"},
+      {"role": "assistant", "content": "x + (x+1) + (x+2) = 78 → 3x+3=78 → 3x=75 → x=25. Números: 25, 26, 27"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "Resuelve x⁵ - 3x³ + 2x = 0"},
+      {"role": "assistant", "content": "Factor común x(x⁴-3x²+2)=0 → x(x²-1)(x²-2)=0 → Soluciones: x=0, x=±1, x=±√2"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "Resuelve 2x² + 5x + 10 = 0"},
+      {"role": "assistant", "content": "Discriminante: 25-80 = -55 → Soluciones complejas: x = [-5 ± i√55]/4. Ecuación cuadrática sin raíces reales"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "Resuelve x + √(x) - 6 = 0"},
+      {"role": "assistant", "content": "Sustituir y=√x: y² + y -6=0 → y=2 → x=4; y=-3 (descartado). Solución real x=4"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "Resuelve √(x + √x) = 2"},
+      {"role": "assistant", "content": "Cuadrar: x + √x =4 → √x=4-x → cuadrar: x=16-8x+x² → x²-9x+16=0 → x=(9±√17)/2. Verificar soluciones válidas"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "Resuelve log₂(x²) - log₂(x+2) = 3"},
+      {"role": "assistant", "content": "Propiedades: log₂[x²/(x+2)] =3 → x²/(x+2)=8 → x²-8x-16=0 → x=4±4√2. Verificar dominio x>0 y x≠-2"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "¿Qué es un intervalo cerrado en la recta real?"},
+      {"role": "assistant", "content": "Es un conjunto que incluye todos los números entre dos extremos a y b, incluyendo estos. Notación: [a,b]. Ejemplo: [2,5] = {x ∈ ℝ | 2 ≤ x ≤ 5}"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "Representa (-∞, 3) ∪ [5, 8] en notación de intervalos"},
+      {"role": "assistant", "content": "(-∞, 3) ∪ [5,8]. Son todos los números menores a 3 o mayores/iguales a 5 y menores/iguales a 8"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "Calcula |π - 4|"},
+      {"role": "assistant", "content": "Como π ≈ 3.14 < 4 → |π - 4| = 4 - π ≈ 0.858. El módulo siempre da resultado no negativo"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "Resuelve |2x - 5| = 7"},
+      {"role": "assistant", "content": "Caso 1: 2x-5=7 → 2x=12 → x=6. Caso 2: 2x-5=-7 → 2x=-2 → x=-1. Soluciones: x=6 y x=-1"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "Expresa como intervalo: {x | -1 < x ≤ 3 o x > 5}"},
+      {"role": "assistant", "content": "(-1, 3] ∪ (5, ∞). Unión de dos intervalos disjuntos"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "Resuelve |x + 3| < 4"},
+      {"role": "assistant", "content": "-4 < x+3 < 4 → -7 < x < 1. Solución: (-7, 1). Desigualdad de módulo tipo 'menor que'"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "¿Qué es el entorno reducido de centro 2 y radio 0.5?"},
+      {"role": "assistant", "content": "(2 - 0.5, 2 + 0.5) excluyendo 2 → (1.5, 2) ∪ (2, 2.5). Notación: (1.5, 2.5) - {2}"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "Resuelve 2 ≤ |x - 1| < 5"},
+      {"role": "assistant", "content": "Dividir en: 2 ≤ |x-1| y |x-1| <5 → Solución: [-4, -1] ∪ [3,6). Intervalo compuesto"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "Halla A ∩ B si A = [-2,4) y B = (1,7]"},
+      {"role": "assistant", "content": "Intersección: (1,4). Números comunes a ambos intervalos"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "Resuelve |3x + 2| ≥ 5"},
+      {"role": "assistant", "content": "3x+2 ≥5 → x≥1 o 3x+2 ≤-5 → x≤-7/3. Solución: (-∞, -7/3] ∪ [1, ∞)"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "Grafica el intervalo {x | x < 0 o 2 ≤ x ≤ 5}"},
+      {"role": "assistant", "content": "←------)0 [2────5]──→. Representación en recta: (-∞,0) ∪ [2,5]"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "Resuelve | |x - 2| - 3 | = 1"},
+      {"role": "assistant", "content": "Caso 1: |x-2| -3 =1 → |x-2|=4 → x=6 o x=-2. Caso 2: |x-2| -3=-1 → |x-2|=2 → x=4 o x=0. Soluciones: -2,0,4,6"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "¿Cómo se expresa ℝ como intervalo?"},
+      {"role": "assistant", "content": "(-∞, ∞). Abarca todos los números reales sin restricciones"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "Resuelve 1/|x - 1| > 2"},
+      {"role": "assistant", "content": "1/|x-1|>2 → |x-1|<1/2 → -1/2 <x-1<1/2 → 1/2 <x<3/2. Dominio: x ≠1 (ya incluido en solución)"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "Demuestra que |a + b| ≤ |a| + |b|"},
+      {"role": "assistant", "content": "Desigualdad triangular: Usando cuadrados: (|a+b|)² ≤ (|a|+|b|)² → a²+2ab+b² ≤a²+2|ab|+b² → Verdadero pues ab ≤|ab|"}
+    ]
+  }
+]
