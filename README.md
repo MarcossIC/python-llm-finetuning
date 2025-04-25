@@ -8,7 +8,7 @@ Tener instalado Python. En caso de usar windows tener configurado python en el p
 
 ## Script de ejecucion
 ```shell
-python train.py --dataset_path ./data/train.json --bit_precision 4 --batch_size 1 --grad_accum_steps 16 --max_length 512 --save_steps 50
+python train.py --dataset_path ./data/train.json --bit_precision 4 --batch_size 1 --grad_accum_steps 16 --max_length 256 --save_steps 5 --lora_r 8 --lora_alpha 16
 ```
 
 ## Caso de error no detecta GPU
@@ -32,4 +32,10 @@ pip install transformers datasets peft bitsandbytes torch evaluate rich psutil n
 Este script de chat te levanta el modelo localmente y puedes hablar con el modelo por consola
 ```shell
 python chat.py --base_model ./deepseek-math-7b-instruct --adapter_dir finetuned-math-model --bit_precision 4
+```
+
+
+## Merge model
+```shell
+python merge.py --base_model ./deepseek-math-7b-instruct --adapter_dir ./finetuned-math-model --output_dir merged_model
 ```

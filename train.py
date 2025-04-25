@@ -145,9 +145,12 @@ class MemoryLoggingCallback(TrainerCallback):
             logger.info(f"Step {state.global_step}: 🧠 GPU Memory: {allocated:.2f}GB allocated, {reserved:.2f}GB reserved")
 
 def main():
+    # 1. Parseas argumentos
     args = parse_args()
-    logger = setup_logging()
+    # 2. Siembras todas las fuentes de aleatoriedad
     set_seed(args.seed)
+    # 3. Ahora configuras logging, cargas datos, modelos, etc.
+    logger = setup_logging()
 
     # Determine device
     if args.device == "auto":
@@ -176,7 +179,14 @@ def main():
         tokenizer = AutoTokenizer.from_pretrained(
             args.model_name, trust_remote_code=True
         )
-        tokenizer.pad_token = tokenizer.eos_token
+        if tokenizer.pad_token is None:
+            if tokenizer.eos_token is not None:
+                tokenizer.pad_token = tokenizer.eos_token
+                logger.warning("⚠️ Tokenizador no tenía pad_token, se estableció a eos_token.")
+            else:
+                 # Añade un pad token si ni siquiera tiene eos (raro pero posible)
+                 tokenizer.add_special_tokens({'pad_token': '[PAD]'})
+                 logger.warning("⚠️ Tokenizador no tenía pad_token ni eos_token. Se añadió [PAD]")
         logger.info("✅ Tokenizer loaded successfully")
     except Exception as e:
         logger.error(f"❌ Error loading tokenizer: {e}")
@@ -193,11 +203,16 @@ def main():
             bnb_4bit_quant_type="nf4"
         )
         
+        torch_dtype = torch.float16 if args.bit_precision in (4,8) else None
         base_model = AutoModelForCausalLM.from_pretrained(
             args.model_name,
             quantization_config=quantization_config,
             device_map="auto",  # Automatically manage memory
-            trust_remote_code=True
+            offload_folder="offload",
+            torch_dtype=torch_dtype,
+            trust_remote_code=True,
+            max_memory={0: "4GiB"},
+            offload_state_dict=True
         )
         logger.info("✅ Base model loaded successfully")
         
@@ -206,6 +221,7 @@ def main():
 
         # Optimizations
         base_model.gradient_checkpointing_enable()
+        base_model.config.use_cache = False
         try:
             base_model.enable_xformers_memory_efficient_attention()
             logger.info("✅ xFormers memory-efficient attention enabled")
@@ -291,6 +307,8 @@ def main():
         save_total_limit=3,
         fp16=True,
         optim="adamw_torch",
+        dataloader_num_workers=0,
+        gradient_checkpointing=True,
         report_to=[],
         logging_dir=os.path.join(args.output_dir, "logs"),
         load_best_model_at_end=True,
@@ -326,6 +344,8 @@ def main():
 
     logger.info("🚀 Starting training...")
     try:
+        free_memory()
+        log_gpu_memory(logger)
         trainer.train()
         trainer.save_model()
         if args.push_to_hub:
