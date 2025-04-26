@@ -2,3 +2,5 @@ deepseek-math-7b-instruct/pytorch_model-00001-of-00002.bin
 deepseek-math-7b-instruct/pytorch_model-00002-of-00002.bin
 __pycache__
 finetuned-math-model
+LLama-3.2-1B/*
+venv/*

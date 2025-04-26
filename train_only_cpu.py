@@ -29,7 +29,7 @@ def parse_args():
         description="Fine-tune a causal LM with QLoRA and optimizations"
     )
     parser.add_argument("--model_name", type=str,
-                        default="./deepseek-math-7b-instruct",
+                        default="./Llama-3.2-1B/Llama-3.2-1B/",
                         help="Path or name of the pretrained model")
     parser.add_argument("--dataset_path", type=str, required=True,
                         help="JSON file with training data")
@@ -194,59 +194,98 @@ def main():
 
     # Load model with quantization
     logger.info(f"⚙️  Loading model with {args.bit_precision}-bit quantization...")
+    
+   # Load model on CPU without BitsAndBytes quantization
     try:
-        quantization_config = BitsAndBytesConfig(
-            load_in_4bit=args.bit_precision == 4,
-            load_in_8bit=args.bit_precision == 8,
-            bnb_4bit_compute_dtype=torch.float16,
-            bnb_4bit_use_double_quant=True,
-            bnb_4bit_quant_type="nf4"
-        )
-        
-        torch_dtype = torch.float16 if args.bit_precision in (4,8) else None
+        torch_dtype = torch.float32  # Use float32 for CPU
+    
+    # Set device_map to CPU
         base_model = AutoModelForCausalLM.from_pretrained(
             args.model_name,
-            quantization_config=quantization_config,
-            device_map="auto",  # Automatically manage memory
-            offload_folder="offload",
+            device_map="cpu",
             torch_dtype=torch_dtype,
             trust_remote_code=True,
-            max_memory={0: "4GiB"},
-            offload_state_dict=True
+            low_cpu_mem_usage=True  # Help with memory usage on CPU
         )
-        logger.info("✅ Base model loaded successfully")
         
-        # Log memory usage after model load
-        log_gpu_memory(logger)
+        use_grad_ckpt = False # O False si decides desactivarlo en TrainingArguments
 
-        # Optimizations
-        base_model.gradient_checkpointing_enable()
-        base_model.config.use_cache = False
-        try:
-            base_model.enable_xformers_memory_efficient_attention()
-            logger.info("✅ xFormers memory-efficient attention enabled")
-        except Exception:
-            logger.warning("⚠️ xFormers not available, skipping")
+        # Asegúrate de que la configuración de caché del modelo sea compatible
+        # con gradient checkpointing si está activado.
+        # prepare_model_for_kbit_training lo hace, pero puedes ser explícito:
+        if use_grad_ckpt:
+            base_model.config.use_cache = False # Necesario para gradient checkpointing
 
-        # Prepare model for training
-        logger.info("🔧 Preparing model for quantized training...")
-        base_model = prepare_model_for_kbit_training(base_model)
+        # Llama a la función de preparación
+        model_prepared = prepare_model_for_kbit_training(
+            base_model,
+            use_gradient_checkpointing=use_grad_ckpt
+        )
         
-        # Configure LoRA
+        
+        logger.info("✅ Base model loaded successfully on CPU")
+    
+    # Log memory usage after model load
+        # log_gpu_memory(logger)
+
+
+        target_modules = None
+    
+    # Try to detect model architecture and set appropriate target modules
+        if hasattr(model_prepared, "config"):
+            model_type = getattr(base_model.config, "model_type", "")
+            if "llama" in model_type.lower():
+                target_modules = ["q_proj", "k_proj", "v_proj", "o_proj"]
+            elif "mistral" in model_type.lower():
+                target_modules = ["q_proj", "k_proj", "v_proj", "o_proj"]
+            elif "gpt-neox" in model_type.lower():
+                target_modules = ["query_key_value", "dense", "dense_h_to_4h", "dense_4h_to_h"]
+            elif "gpt2" in model_type.lower():
+                target_modules = ["c_attn", "c_proj", "c_fc"]
+            else:
+                # Default fallback
+                target_modules = ["query", "key", "value", "dense"]
+
+        if target_modules is None:
+            logger.warning("⚠️ Couldn't determine target modules, using default set")
+            target_modules = ["query", "key", "value", "dense"]
+
+        logger.info(f"🎯 Using target modules: {target_modules}")
+
+    # Remove GPU-specific optimizations
+        # base_model.config.use_cache = False
+    
+    # Configure LoRA without prepare_model_for_kbit_training
         logger.info(f"⚙️ Configuring LoRA (r={args.lora_r}, alpha={args.lora_alpha})...")
+        # lora_cfg = LoraConfig(
+        #     r=args.lora_r,
+        #     lora_alpha=args.lora_alpha,
+        #     target_modules=["q_proj", "k_proj", "v_proj", "o_proj"],
+        #     lora_dropout=args.lora_dropout,
+        #     bias="none",
+        #     task_type="CAUSAL_LM"
+        # )
+        
         lora_cfg = LoraConfig(
             r=args.lora_r,
             lora_alpha=args.lora_alpha,
-            target_modules=["q_proj", "k_proj", "v_proj", "o_proj"],
+            target_modules=target_modules,
             lora_dropout=args.lora_dropout,
             bias="none",
             task_type="CAUSAL_LM"
         )
         
-        model = get_peft_model(base_model, lora_cfg)
+        # for param in base_model.parameters():
+        #     param.requires_grad = False
+    
+        model = get_peft_model(model_prepared, lora_cfg)
+        model.print_trainable_parameters()
+        trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+        if trainable_params == 0:
+            raise ValueError("No trainable parameters found! Training can't proceed.")
         logger.info(f"✅ PEFT model created - Trainable parameters: {model.print_trainable_parameters()}")
-        
-        # Log memory after PEFT setup
+    
+    # Log memory after PEFT setup
         log_gpu_memory(logger)
     except Exception as e:
         logger.error(f"❌ Error loading model: {e}")
@@ -305,10 +344,10 @@ def main():
         save_strategy="steps",
         save_steps=args.save_steps,
         save_total_limit=3,
-        fp16=True,
+        fp16=False,
         optim="adamw_torch",
         dataloader_num_workers=0,
-        gradient_checkpointing=True,
+        gradient_checkpointing=use_grad_ckpt,
         report_to=[],
         logging_dir=os.path.join(args.output_dir, "logs"),
         load_best_model_at_end=True,

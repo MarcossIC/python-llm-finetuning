@@ -8,7 +8,7 @@ Tener instalado Python. En caso de usar windows tener configurado python en el p
 
 ## Script de ejecucion
 ```shell
-python train.py --dataset_path ./data/train.json --bit_precision 4 --batch_size 1 --grad_accum_steps 16 --max_length 256 --save_steps 5 --lora_r 8 --lora_alpha 16
+python train.py --dataset_path ./data/train.json --bit_precision 4 --batch_size 1 --grad_accum_steps 8 --max_length 128 --save_steps 100 --lora_r 4 --lora_alpha 8
 ```
 
 ## Caso de error no detecta GPU
