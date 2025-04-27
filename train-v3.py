@@ -43,6 +43,8 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description="Fine-tune a causal LM with QLoRA and optimizations"
     )
+    parser.add_argument("--cpu_ram", type=str, default="32GB",
+                        help="RAM disponible para CPU (ej. '64GB')")
     parser.add_argument("--model_name", type=str,
                         default="./deepseek-math-7b-instruct",
                         help="Path or name of the pretrained model")
@@ -93,6 +95,22 @@ def optimize_hyperparams(args, logger):
     using_gpu = torch.cuda.is_available() and args.device != "cpu"
     args.using_gpu = using_gpu
     optimized = args.__dict__.copy()
+
+    ram = psutil.virtual_memory()
+    total_ram = ram.total / (1024 ** 3)
+    available_ram = ram.available / (1024 ** 3)
+
+    # Ajustes más conservadores para RAM baja
+    if total_ram < 16:
+        safe_ram = max(0.3 * total_ram, available_ram - 1)  # Reservar 70% del sistema
+    elif total_ram < 32:
+        safe_ram = max(0.5 * total_ram, available_ram - 2)
+    else:
+        safe_ram = max(0.7 * total_ram, available_ram - 4)
+        
+    args.cpu_ram = f"{safe_ram:.0f}GB"
+    args.available_ram = available_ram
+    logger.info(f"💻 RAM Detection || Total: {total_ram:.1f}GB | Available: {available_ram:.1f}GB | Usable: {safe_ram:.1f}GB")
     
     # Ajuste basado en si usamos GPU o CPU
     if using_gpu:
@@ -110,15 +128,15 @@ def optimize_hyperparams(args, logger):
         
         # Ajustes basados en VRAM disponible
         if vram_total >= 24:  # GPU de alta gama (24+ GB)
-            logger.info("🚀 High-end GPU detected, optimizing for performance")
+            logger.info("🚀  High-end GPU detected, optimizing for performance")
             optimized['batch_size'] = max(args.batch_size, 4)
             optimized['grad_accum_steps'] = min(args.grad_accum_steps, 4)
         elif vram_total >= 10:  # GPU de gama media (10-24 GB)
-            logger.info("🚀 Mid-range GPU detected, balancing performance and memory")
+            logger.info("🚀  Mid-range GPU detected, balancing performance and memory")
             optimized['batch_size'] = max(args.batch_size, 2)
             optimized['grad_accum_steps'] = min(args.grad_accum_steps, 8)
         else:  # GPU de gama baja (<10 GB)
-            logger.info("🔧 Limited GPU memory detected, optimizing for stability")
+            logger.info("🔧  Limited GPU memory detected, optimizing for stability")
             optimized['batch_size'] = min(args.batch_size, 1)
             optimized['grad_accum_steps'] = max(args.grad_accum_steps, 16)
             optimized['max_length'] = min(args.max_length, 512)  # Reducir longitud de secuencia
@@ -127,7 +145,7 @@ def optimize_hyperparams(args, logger):
         optimized['bit_precision'] = args.bit_precision  # Mantener la cuantización solicitada
     else:
         # En CPU priorizar estabilidad sobre velocidad
-        logger.info("🔧 CPU detected, optimizing for stability over speed")
+        logger.info("🔧  CPU detected, optimizing for stability over speed")
         optimized['batch_size'] = 1
         optimized['grad_accum_steps'] = max(args.grad_accum_steps, 16)
         optimized['max_length'] = min(args.max_length, 256)  # Secuencias más cortas
@@ -138,7 +156,7 @@ def optimize_hyperparams(args, logger):
 
     # Calcular procesos de carga de datos
     args.num_proc = 1 if not using_gpu else min(os.cpu_count() or 1, 4)
-    logger.info(f"🔢 Number of dataloader processes: {args.num_proc}")
+    logger.info(f"🔢  Number of dataloader processes: {args.num_proc}")
 
     # Asegurar campos básicos
     if not hasattr(args, 'full_finetune'):
@@ -152,7 +170,7 @@ def optimize_hyperparams(args, logger):
               if hasattr(args, k) and getattr(args, k) != v}
     
     if changes:
-        logger.info("📊 Hyperparameter optimizations:")
+        logger.info("📊  Hyperparameter optimizations:")
         for param, (old, new) in changes.items():
             logger.info(f"  • {param}: {old} → {new}")
     
@@ -251,10 +269,10 @@ def get_model_targets(model_config, logger):
         targets = ['query','key','value','dense']
 
     if targets is None:
-        logger.warning("⚠️ Couldn't determine target modules, using default set")
+        logger.warning("⚠️  Couldn't determine target modules, using default set")
         target_modules = ["q_proj", "k_proj", "v_proj", "o_proj"]  # Common default
     else:
-        logger.info(f"🎯 Using LoRA target_modules={targets}")
+        logger.info(f"🎯  Using LoRA target_modules={targets}")
     return targets
 
 # Libera memoria no utilizada
@@ -269,19 +287,19 @@ def load_model(args, logger):
     """
     Carga y prepara un modelo para CPU o GPU con manejo robusto de errores.
     """
-    logger.info(f"⚙️ Loading model with {getattr(args, 'bit_precision', 'full')} precision...")
+    logger.info(f"⚙️  Loading model with {getattr(args, 'bit_precision', 'full')} precision...")
     try:
         tokenizer = AutoTokenizer.from_pretrained(args.model_name, trust_remote_code=True)
         if tokenizer.pad_token is None:
             if tokenizer.eos_token:
                 tokenizer.pad_token = tokenizer.eos_token
-                logger.warning("⚠️ pad_token set to eos_token.")
+                logger.warning("⚠️  pad_token set to eos_token.")
             else:
                 tokenizer.add_special_tokens({'pad_token': '[PAD]'})
-                logger.warning("⚠️ Added [PAD] token.")
-        logger.info("✅ Tokenizer ready")
+                logger.warning("⚠️  Added [PAD] token.")
+        logger.info("✅  Tokenizer ready")
     except Exception as e:
-        logger.error(f"❌ Error loading tokenizer: {str(e)}")
+        logger.error(f"❌  Error loading tokenizer: {str(e)}")
         raise
 
     try:        
@@ -301,13 +319,13 @@ def load_model(args, logger):
             last_error = None
             for i, strategy in enumerate(strategies):
                 try:
-                    logger.info(f"🔄 Trying model loading strategy {i+1}/{len(strategies)}...")
+                    logger.info(f"🔄  Trying model loading strategy {i+1}/{len(strategies)}...")
                     model = strategy()
-                    logger.info(f"✅ Successfully loaded model with strategy {i+1}")
+                    logger.info(f"✅  Successfully loaded model with strategy {i+1}")
                     break
                 except Exception as e:
                     last_error = e
-                    logger.warning(f"⚠️ Strategy {i+1} failed: {str(e)}")
+                    logger.warning(f"⚠️  Strategy {i+1} failed: {str(e)}")
                     free_memory()  # Liberar memoria antes de intentar siguiente estrategia
                     
                     # Si llegamos a la última estrategia y también falla, propagar el error
@@ -326,15 +344,15 @@ def load_model(args, logger):
         # 4) Configurar LoRA o cargar adapters desde checkpoint
         if not getattr(args, 'full_finetune', False):
             if getattr(args, 'checkpoint_dir', None):
-                logger.info("🔄 Loading adapters from checkpoint...")
+                logger.info("🔄  Loading adapters from checkpoint...")
                 model = PeftModel.from_pretrained(
                     model, 
                     args.checkpoint_dir, 
                     is_trainable=True
                 )
-                logger.info("✅ Adapters loaded")
+                logger.info("✅  Adapters loaded")
             else:
-                logger.info(f"⚙️ Configuring LoRA (r={args.lora_r}, alpha={args.lora_alpha})...")
+                logger.info(f"⚙️  Configuring LoRA (r={args.lora_r}, alpha={args.lora_alpha})...")
                 targets = get_model_targets(model.config, logger)
 
                 lora_cfg = LoraConfig(
@@ -346,7 +364,7 @@ def load_model(args, logger):
                     task_type="CAUSAL_LM"
                 )
                 model = get_peft_model(model, lora_cfg)
-                logger.info("✅ LoRA applied")
+                logger.info("✅  LoRA applied")
 
             # (Opcional, pero recomendado) Ajustar módulos de precisión
             for name, module in model.named_modules():
@@ -363,22 +381,22 @@ def load_model(args, logger):
             trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
             total     = sum(p.numel() for p in model.parameters())
 
-            logger.info(f"📊 Params: Trainable: {trainable} || Total: {total} || Use: ({100*trainable/total:.2f}%)")
+            logger.info(f"📊  Params: Trainable: {trainable} || Total: {total} || Use: ({100*trainable/total:.2f}%)")
 
             if trainable == 0:
-                logger.warning("⚠️ No trainable parameters found! Check LoRA configuration.")
+                logger.warning("⚠️  No trainable parameters found! Check LoRA configuration.")
         else:
-            logger.info("🔄 No LoRA applied")
+            logger.info("🔄  No LoRA applied")
 
         log_gpu_memory(logger)
         # Redimensionar embeddings si se añadieron tokens
         if len(tokenizer) != model.config.vocab_size:
-            logger.info(f"🔄 Resizing token embeddings from {model.config.vocab_size} to {len(tokenizer)}")
+            logger.info(f"🔄  Resizing token embeddings from {model.config.vocab_size} to {len(tokenizer)}")
             model.resize_token_embeddings(len(tokenizer))
         
         return model, tokenizer
     except Exception as e:
-        logger.error(f"❌ Error loading model: {str(e)}")
+        logger.error(f"❌  Error loading model: {str(e)}")
         import traceback
         logger.error(traceback.format_exc())
         raise e
@@ -443,21 +461,44 @@ def _load_cpu_model(args, logger):
     """
     Helper function para cargar modelo en CPU.
     """
-    logger.info("🌐 Loading model in CPU-only mode with float32 precision...")
-    logger.warning("⚠️ CPU training will be slow. Consider using a GPU if available.")
+    logger.info("🌐  Loading model in CPU mode with disk offloading...")
     
-    model = AutoModelForCausalLM.from_pretrained(
-        args.model_name,
-        device_map={'': 'cpu'},
-        torch_dtype=torch.float32,
-        trust_remote_code=True,
-        low_cpu_mem_usage=True,
-    )
+    # Crear directorio para offload
+    offload_dir = os.path.join(args.output_dir, "offload")
+    os.makedirs(offload_dir, exist_ok=True)
     
-    logger.info("✅ Model loaded on CPU (float32)")
-    model = prepare_model_for_kbit_training(model)
-    
-    return model
+    try:
+        # Convertir RAM string a bytes (ej. "32GB" → 34359738368 bytes)
+        max_ram = int(args.cpu_ram.replace("GB", "")) * (1024 ** 3)
+
+        # Configuración especial para CPU
+        model = AutoModelForCausalLM.from_pretrained(
+            args.model_name,
+            device_map="cpu",
+            max_memory={"cpu": max_ram},
+            torch_dtype=torch.float32,
+            trust_remote_code=True,
+            low_cpu_mem_usage=True,
+            offload_folder=offload_dir,
+            offload_state_dict=True,
+            quantization_config=BitsAndBytesConfig(load_in_8bit=True) if args.bit_precision == 8 else None
+        )
+        
+        # Forzar modelo a CPU
+        torch.cuda.is_available = lambda: False
+        model = model.to('cpu')
+        logger.info("✅  Model loaded on CPU with disk offloading")
+        return model
+    except Exception as e:
+        logger.error(f"❌  Error loading model: {str(e)}")
+        logger.info("🔄  Intentando carga en 8-bit...")
+        return AutoModelForCausalLM.from_pretrained(
+            args.model_name,
+            device_map="cpu",
+            torch_dtype=torch.float32,
+            trust_remote_code=True,
+            low_cpu_mem_usage=True 
+        )
 
 def get_last_checkpoint(checkpoint_dir, logger, is_full_finetune=False):
     # Verificar si el directorio existe
@@ -530,11 +571,11 @@ def process_dataset(args, tokenizer, logger):
         
         # Configurar chat template si es necesario
         if tokenizer.chat_template is None:
-            logger.warning("⚠️ No chat template found, setting default...")
+            logger.warning("⚠️  No chat template found, setting default...")
             # Template simple que concatena mensajes
             tokenizer.chat_template = "{% for message in messages %}{{message['content']}}{% endfor %}"
         else:
-            logger.info("✅ Using model's built-in chat template")
+            logger.info("✅  Using model's built-in chat template")
 
         # Mostrar ejemplo de muestra
         if len(raw) > 0:
@@ -650,7 +691,7 @@ def process_dataset(args, tokenizer, logger):
         # Advertir si hay muchas secuencias truncadas
         if max_len >= args.max_length:
             truncated_pct = sum(1 for l in lengths if l >= args.max_length) / len(lengths) * 100
-            logger.warning(f"⚠️ {truncated_pct:.1f}% de secuencias fueron truncadas al máximo ({args.max_length})")
+            logger.warning(f"⚠️  {truncated_pct:.1f}% de secuencias fueron truncadas al máximo ({args.max_length})")
         
         # Split de train/eval
         splits = tokenized.train_test_split(test_size=min(0.1, 1000/len(tokenized)))
